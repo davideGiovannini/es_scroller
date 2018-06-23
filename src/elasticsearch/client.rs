@@ -3,6 +3,11 @@ extern crate structopt;
 use reqwest::{Client, Url};
 use elasticsearch::models::*;
 
+use std::path::PathBuf;
+use std::fs::File;
+use std::io::Read;
+use serde_json;
+
 #[derive(Debug, StructOpt)]
 #[structopt(name = "example", about = "An example of StructOpt usage.",
             raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
@@ -14,7 +19,8 @@ pub struct ScrollClient {
     index: String,
 
     /// path to a json file containing the query to use (defaults to match_all)
-    query: Option<String>,
+    #[structopt(short = "q", long = "query", parse(from_os_str))]
+    query: Option<PathBuf>,
 
     /// _source  fields
     source: Vec<String>,
@@ -41,13 +47,25 @@ impl<'a> ScrollIter<'a> {
         let client = Client::new();
 
         let default_query = json!({ "match_all": {}});
-
         let default_source = vec!["*".into()];
 
-        let _source = if scroll_client.source.is_empty() { &default_source} else {&scroll_client.source};
+        let _source = if scroll_client.source.is_empty() {
+            &default_source
+        } else {
+            &scroll_client.source
+        };
+
+        let query = if let Some(ref path) = scroll_client.query {
+            let mut file = File::open(path).unwrap();
+            let mut contents = String::new();
+            file.read_to_string(&mut contents).unwrap();
+            serde_json::from_str(&contents).unwrap()
+        } else {
+            default_query
+        };
 
         let body = json!({
-        "query": default_query,
+        "query": query,
         "size":  100,
         "_source": _source
     });
@@ -86,11 +104,7 @@ impl<'a> Iterator for ScrollIter<'a> {
 
             let url = self.host.join("_search/scroll").unwrap();
 
-            let mut res = self.client
-                .get(url)
-                .json(&body)
-                .send()
-                .unwrap();
+            let mut res = self.client.get(url).json(&body).send().unwrap();
 
             let es_response = res.json::<EsResponse>().unwrap();
 

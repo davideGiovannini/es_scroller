@@ -21,16 +21,16 @@ pub struct EsShards {
 #[derive(Debug, Deserialize)]
 pub struct EsHits {
     total: usize,
-    max_score: f64,
+    max_score: Option<f64>,
     pub hits: Vec<EsHit>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EsHit {
-    _index: String,
-    _type: String,
+    //    _index: String,
+    //    _type: String,
     _id: String,
-    _score: f64,
-    _routing: Option<String>,
+    //    _score: f64,
+    //    _routing: Option<String>,
     _source: Value,
 }
