@@ -21,12 +21,23 @@ use elasticsearch::*;
 fn main() {
     let scroll_client = ScrollClient::from_args();
 
+    if let Some(limit) = scroll_client.limit {
+        process_elements(scroll_client.into_iter().take(limit))
+    } else {
+        process_elements(scroll_client.into_iter())
+    };
+}
+
+fn process_elements<I>(scroll: I)
+where
+    I: std::iter::Iterator,
+    I::Item: serde::Serialize,
+{
     let stdout = stdout();
     let mut stdout_lock = stdout.lock();
 
-
-    for item in &scroll_client {
+    for item in scroll {
         let string = serde_json::to_string(&item).unwrap();
-        writeln!(&mut stdout_lock, "{}", &string);
+        writeln!(&mut stdout_lock, "{}", &string).unwrap();
     }
 }

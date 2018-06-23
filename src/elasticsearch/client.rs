@@ -22,6 +22,10 @@ pub struct ScrollClient {
     #[structopt(short = "q", long = "query", parse(from_os_str))]
     query: Option<PathBuf>,
 
+    /// get at most <limit> results
+    #[structopt(short = "l", long = "limit")]
+    pub limit: Option<usize>,
+
     /// _source  fields
     source: Vec<String>,
 }
@@ -65,10 +69,11 @@ impl<'a> ScrollIter<'a> {
         };
 
         let body = json!({
-        "query": query,
-        "size":  100,
-        "_source": _source
-    });
+            "query": query,
+            "size":  100,
+//            "sort": "_uid:asc", // TODO add option to sort on this field (or arbitrary field)
+            "_source": _source,
+        });
 
         let path = format!("{}/{}", scroll_client.index.trim_matches('/'), "_search");
 
