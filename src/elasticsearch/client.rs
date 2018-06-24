@@ -26,6 +26,10 @@ pub struct ScrollClient {
     #[structopt(short = "l", long = "limit")]
     pub limit: Option<usize>,
 
+    /// pretty print output
+    #[structopt(short = "p", long = "pretty")]
+    pub pretty: bool,
+
     /// _source  fields
     source: Vec<String>,
 }
@@ -70,8 +74,8 @@ impl<'a> ScrollIter<'a> {
 
         let body = json!({
             "query": query,
-            "size":  100,
-//            "sort": "_uid:asc", // TODO add option to sort on this field (or arbitrary field)
+            "size":  1000,
+            "sort": &["_doc"], // TODO add option to sort on this field (or arbitrary field)
             "_source": _source,
         });
 
