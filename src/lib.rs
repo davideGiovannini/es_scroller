@@ -19,6 +19,7 @@ use serde_json::Error;
 
 mod elasticsearch;
 pub use elasticsearch::ScrollClient;
+pub use elasticsearch::errors::EsError;
 
 use std::fs::File;
 use std::io::{stdout, Stdout, Write};
@@ -53,7 +54,7 @@ impl FileOrStdout {
     }
 }
 
-pub fn process(scroll_client: ScrollClient) {
+pub fn process(scroll_client: ScrollClient) -> Result<(), EsError> {
     let print_function = if scroll_client.pretty {
         serde_json::to_string_pretty
     } else {
@@ -71,19 +72,20 @@ pub fn process(scroll_client: ScrollClient) {
 
     if let Some(limit) = scroll_client.limit {
         process_elements(
-            scroll_client.into_iter().take(limit),
+            scroll_client.start_scroll()?.take(limit),
             output,
             &scroll_client.index,
             print_function,
         )
     } else {
         process_elements(
-            scroll_client.into_iter(),
+            scroll_client.start_scroll()?,
             output,
             &scroll_client.index,
             print_function,
         )
     };
+    Ok(())
 }
 
 fn process_elements<I>(

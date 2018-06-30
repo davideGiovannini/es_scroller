@@ -3,6 +3,8 @@ extern crate scroller;
 
 use scroller::ScrollClient;
 
+use scroller::EsError;
+
 #[test]
 fn should_handle_wrong_host() {
     let url = reqwest::Url::parse("http://localhost:9999").expect("Invalid url");
@@ -11,7 +13,10 @@ fn should_handle_wrong_host() {
 
     let client = ScrollClient::new(url, "".into(), None, None, None, false, Vec::new());
 
-    scroller::process(client)
+    let result = scroller::process(client);
+
+    assert!(result.is_err());
+    assert_eq!(result.unwrap_err(), EsError::HostUnreachable)
 }
 
 #[test]
@@ -28,7 +33,10 @@ fn should_handle_wrong_index() {
 
     let client = ScrollClient::new(url, index.into(), None, None, None, false, Vec::new());
 
-    scroller::process(client)
+    let result = scroller::process(client);
+
+    assert!(result.is_err());
+    assert_eq!(result.unwrap_err(), EsError::IndexNotFound)
 }
 
 #[test]
@@ -43,10 +51,27 @@ fn should_work() {
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::Ok);
 
-    let client = ScrollClient::new(url, index.into(), None, None, None, false, Vec::new());
+    let client = ScrollClient::new(
+        url,
+        index.into(),
+        Some("/dev/null".into()),
+        None,
+        None,
+        false,
+        Vec::new(),
+    );
 
-    scroller::process(client)
+    let result = scroller::process(client);
+
+    assert!(result.is_ok())
 }
 
 #[test]
-fn should_handle_nonexisting_output() {}
+fn should_handle_timeout() {
+    unimplemented!()
+}
+
+#[test]
+fn should_handle_nonexisting_output() {
+    unimplemented!()
+}

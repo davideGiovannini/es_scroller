@@ -7,6 +7,9 @@ use std::path::PathBuf;
 use std::fs::File;
 use std::io::Read;
 use serde_json;
+use reqwest::StatusCode;
+
+use elasticsearch::errors::EsError;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "example", about = "An example of StructOpt usage.",
@@ -58,39 +61,19 @@ impl ScrollClient {
             source,
         }
     }
-}
-
-impl<'a> IntoIterator for &'a ScrollClient {
-    type Item = EsHit;
-    type IntoIter = ScrollIter<'a>;
-
-    fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
-        ScrollIter::start_scroll(self)
-    }
-}
-
-pub struct ScrollIter<'a> {
-    host: &'a Url,
-    client: Client,
-    scroll_id: String,
-    results_count: usize,
-    hits: Vec<EsHit>,
-}
-
-impl<'a> ScrollIter<'a> {
-    pub fn start_scroll(scroll_client: &'a ScrollClient) -> Self {
+    pub fn start_scroll(&self) -> Result<ScrollIter, EsError> {
         let client = Client::new();
 
         let default_query = json!({ "match_all": {}});
         let default_source = vec!["*".into()];
 
-        let _source = if scroll_client.source.is_empty() {
+        let _source = if self.source.is_empty() {
             &default_source
         } else {
-            &scroll_client.source
+            &self.source
         };
 
-        let query = if let Some(ref path) = scroll_client.query {
+        let query = if let Some(ref path) = self.query {
             let mut file = File::open(path).unwrap();
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
@@ -100,33 +83,45 @@ impl<'a> ScrollIter<'a> {
         };
 
         let body = json!({
-            "query": query,
-            "size":  1000,
-            "sort": &["_doc"], // TODO add option to sort on this field (or arbitrary field)
-            "_source": _source,
-        });
+    "query": query,
+    "size":  1000,
+    "sort": &["_doc"], // TODO add option to sort on this field (or arbitrary field)
+    "_source": _source,
+    });
 
-        let path = format!("{}/{}", scroll_client.index.trim_matches('/'), "_search");
+        let path = format!("{}/{}", self.index.trim_matches('/'), "_search");
 
-        let url = scroll_client.host.join(&path).unwrap();
+        let url = self.host.join(&path).unwrap();
 
-        let mut res = client
+        let res = client
             .get(url)
             .query(&[("scroll", "1m")])
             .json(&body)
-            .send()
-            .unwrap();
+            .send();
+
+        let mut res = res.map_err(|_| EsError::HostUnreachable)?;
+
+        if res.status() == StatusCode::NotFound {
+            return Err(EsError::IndexNotFound);
+        }
 
         let es_response = res.json::<EsResponse>().unwrap();
-
-        ScrollIter {
-            host: &scroll_client.host,
+        Ok(ScrollIter {
+            host: &self.host,
             client,
             results_count: es_response.hits.total,
             scroll_id: es_response._scroll_id,
             hits: es_response.hits.hits,
-        }
+        })
     }
+}
+
+pub struct ScrollIter<'a> {
+    host: &'a Url,
+    client: Client,
+    scroll_id: String,
+    results_count: usize,
+    hits: Vec<EsHit>,
 }
 
 impl<'a> Iterator for ScrollIter<'a> {
