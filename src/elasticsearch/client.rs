@@ -16,7 +16,11 @@ pub struct ScrollClient {
     host: Url,
 
     /// Index to scroll
-    index: String,
+    pub index: String,
+
+    /// path of the output jsonl file (if not given defaults to stdout).
+    #[structopt(parse(from_os_str))]
+    pub output: Option<PathBuf>,
 
     /// path to a json file containing the query to use (defaults to match_all)
     #[structopt(short = "q", long = "query", parse(from_os_str))]
@@ -34,6 +38,28 @@ pub struct ScrollClient {
     source: Vec<String>,
 }
 
+impl ScrollClient {
+    pub fn new(
+        host: Url,
+        index: String,
+        output: Option<PathBuf>,
+        query: Option<PathBuf>,
+        limit: Option<usize>,
+        pretty: bool,
+        source: Vec<String>,
+    ) -> Self {
+        ScrollClient {
+            host,
+            index,
+            output,
+            query,
+            limit,
+            pretty,
+            source,
+        }
+    }
+}
+
 impl<'a> IntoIterator for &'a ScrollClient {
     type Item = EsHit;
     type IntoIter = ScrollIter<'a>;
@@ -47,6 +73,7 @@ pub struct ScrollIter<'a> {
     host: &'a Url,
     client: Client,
     scroll_id: String,
+    results_count: usize,
     hits: Vec<EsHit>,
 }
 
@@ -95,6 +122,7 @@ impl<'a> ScrollIter<'a> {
         ScrollIter {
             host: &scroll_client.host,
             client,
+            results_count: es_response.hits.total,
             scroll_id: es_response._scroll_id,
             hits: es_response.hits.hits,
         }
@@ -124,5 +152,9 @@ impl<'a> Iterator for ScrollIter<'a> {
             // todo check terminated_early bool
         }
         self.hits.pop()
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.results_count, None)
     }
 }

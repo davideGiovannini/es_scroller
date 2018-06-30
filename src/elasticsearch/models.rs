@@ -20,7 +20,7 @@ pub struct EsShards {
 
 #[derive(Debug, Deserialize)]
 pub struct EsHits {
-    total: usize,
+    pub total: usize,
     max_score: Option<f64>,
     pub hits: Vec<EsHit>,
 }
