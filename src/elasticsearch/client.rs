@@ -12,7 +12,7 @@ use reqwest::StatusCode;
 use elasticsearch::errors::EsError;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "example", about = "An example of StructOpt usage.",
+#[structopt(about = "An example of StructOpt usage.",
             raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
 pub struct ScrollClient {
     /// Url and port of the elastic search host
