@@ -37,6 +37,10 @@ pub struct ScrollClient {
     #[structopt(short = "p", long = "pretty")]
     pub pretty: bool,
 
+    /// hide the progressbar
+    #[structopt(short = "s", long = "silent")]
+    pub silent: bool,
+
     /// _source  fields
     source: Vec<String>,
 }
@@ -49,6 +53,7 @@ impl ScrollClient {
         query: Option<PathBuf>,
         limit: Option<usize>,
         pretty: bool,
+        silent: bool,
         source: Vec<String>,
     ) -> Self {
         ScrollClient {
@@ -58,6 +63,7 @@ impl ScrollClient {
             query,
             limit,
             pretty,
+            silent: quiet,
             source,
         }
     }

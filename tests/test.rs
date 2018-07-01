@@ -11,7 +11,7 @@ fn should_handle_wrong_host() {
 
     assert!(reqwest::get(url.clone()).is_err());
 
-    let client = ScrollClient::new(url, "".into(), None, None, None, false, Vec::new());
+    let client = ScrollClient::new(url, "".into(), None, None, None, false, true, Vec::new());
 
     let result = scroller::process(client);
 
@@ -31,7 +31,7 @@ fn should_handle_wrong_index() {
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::NotFound);
 
-    let client = ScrollClient::new(url, index.into(), None, None, None, false, Vec::new());
+    let client = ScrollClient::new(url, index.into(), None, None, None, false, true, Vec::new());
 
     let result = scroller::process(client);
 
@@ -58,6 +58,7 @@ fn should_work() {
         None,
         None,
         false,
+        true,
         Vec::new(),
     );
 

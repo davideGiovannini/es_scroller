@@ -11,6 +11,7 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -p, --pretty     pretty print output
+    -s, --silent     hide the progressbar
     -V, --version    Prints version information
 
 OPTIONS:

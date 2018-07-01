@@ -75,6 +75,7 @@ pub fn process(scroll_client: ScrollClient) -> Result<(), EsError> {
             scroll_client.start_scroll()?.take(limit),
             output,
             &scroll_client.index,
+            scroll_client.silent,
             print_function,
         )
     } else {
@@ -82,6 +83,7 @@ pub fn process(scroll_client: ScrollClient) -> Result<(), EsError> {
             scroll_client.start_scroll()?,
             output,
             &scroll_client.index,
+            scroll_client.silent,
             print_function,
         )
     };
@@ -92,6 +94,7 @@ fn process_elements<I>(
     scroll: I,
     mut output: FileOrStdout,
     index_name: &str,
+    silent: bool,
     print_function: fn(&I::Item) -> Result<String, Error>,
 ) where
     I: std::iter::Iterator,
@@ -99,7 +102,7 @@ fn process_elements<I>(
 {
     let progress_bar = ProgressBar::new(scroll.size_hint().0 as u64);
 
-    let target = if output.is_stdout() {
+    let target = if output.is_stdout() || silent {
         ProgressDrawTarget::hidden()
     } else {
         ProgressDrawTarget::stderr()
