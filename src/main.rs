@@ -6,5 +6,5 @@ use scroller::{EsError, ScrollClient};
 
 fn main() -> Result<(), EsError> {
     let scroll_client = ScrollClient::from_args();
-    scroller::process(scroll_client)
+    scroller::process(&scroll_client)
 }

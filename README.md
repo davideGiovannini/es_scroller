@@ -6,12 +6,13 @@ Davide Giovannini <giovannini.davide90@gmail.com>
 An example of StructOpt usage.
 
 USAGE:
-    scroller [FLAGS] [OPTIONS] <host> <index> [ARGS]
+    scroller [FLAGS] [OPTIONS] <host> <index> <output> [source]...
 
 FLAGS:
     -h, --help       Prints help information
     -p, --pretty     pretty print output
     -s, --silent     hide the progressbar
+        --stream     Stream output to stdout
     -V, --version    Prints version information
 
 OPTIONS:
@@ -21,7 +22,7 @@ OPTIONS:
 ARGS:
     <host>         Url and port of the elastic search host
     <index>        Index to scroll
-    <output>       path of the output jsonl file (if not given defaults to stdout).
+    <output>       path of the output jsonl file (only if not using --stream)
     <source>...    _source  fields
 ```
 

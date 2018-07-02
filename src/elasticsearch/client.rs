@@ -21,8 +21,8 @@ pub struct ScrollClient {
     /// Index to scroll
     pub index: String,
 
-    /// path of the output jsonl file (if not given defaults to stdout).
-    #[structopt(parse(from_os_str))]
+    /// path of the output jsonl file (only if not using --stream)
+    #[structopt(required_unless = "stream", parse(from_os_str))]
     pub output: Option<PathBuf>,
 
     /// path to a json file containing the query to use (defaults to match_all)
@@ -41,6 +41,10 @@ pub struct ScrollClient {
     #[structopt(short = "s", long = "silent")]
     pub silent: bool,
 
+    /// Stream output to stdout
+    #[structopt(long = "stream")]
+    pub stream: bool,
+
     /// _source  fields
     source: Vec<String>,
 }
@@ -54,6 +58,7 @@ impl ScrollClient {
         limit: Option<usize>,
         pretty: bool,
         silent: bool,
+        stream: bool,
         source: Vec<String>,
     ) -> Self {
         ScrollClient {
@@ -63,7 +68,8 @@ impl ScrollClient {
             query,
             limit,
             pretty,
-            silent: quiet,
+            silent,
+            stream,
             source,
         }
     }

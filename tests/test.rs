@@ -11,9 +11,19 @@ fn should_handle_wrong_host() {
 
     assert!(reqwest::get(url.clone()).is_err());
 
-    let client = ScrollClient::new(url, "".into(), None, None, None, false, true, Vec::new());
+    let client = ScrollClient::new(
+        url,
+        "".into(),
+        None,
+        None,
+        None,
+        false,
+        true,
+        false,
+        Vec::new(),
+    );
 
-    let result = scroller::process(client);
+    let result = scroller::process(&client);
 
     assert!(result.is_err());
     assert_eq!(result.unwrap_err(), EsError::HostUnreachable)
@@ -31,9 +41,19 @@ fn should_handle_wrong_index() {
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::NotFound);
 
-    let client = ScrollClient::new(url, index.into(), None, None, None, false, true, Vec::new());
+    let client = ScrollClient::new(
+        url,
+        index.into(),
+        None,
+        None,
+        None,
+        false,
+        true,
+        false,
+        Vec::new(),
+    );
 
-    let result = scroller::process(client);
+    let result = scroller::process(&client);
 
     assert!(result.is_err());
     assert_eq!(result.unwrap_err(), EsError::IndexNotFound)
@@ -59,10 +79,11 @@ fn should_work() {
         None,
         false,
         true,
+        false,
         Vec::new(),
     );
 
-    let result = scroller::process(client);
+    let result = scroller::process(&client);
 
     assert!(result.is_ok())
 }

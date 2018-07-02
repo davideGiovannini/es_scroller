@@ -54,7 +54,7 @@ impl FileOrStdout {
     }
 }
 
-pub fn process(scroll_client: ScrollClient) -> Result<(), EsError> {
+pub fn process(scroll_client: &ScrollClient) -> Result<(), EsError> {
     let print_function = if scroll_client.pretty {
         serde_json::to_string_pretty
     } else {
