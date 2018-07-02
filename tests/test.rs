@@ -14,12 +14,11 @@ fn should_handle_wrong_host() {
     let client = ScrollClient::new(
         url,
         "".into(),
-        None,
+        "/dev/null".into(),
         None,
         None,
         false,
         true,
-        false,
         Vec::new(),
     );
 
@@ -44,12 +43,11 @@ fn should_handle_wrong_index() {
     let client = ScrollClient::new(
         url,
         index.into(),
-        None,
+        "/dev/null".into(),
         None,
         None,
         false,
         true,
-        false,
         Vec::new(),
     );
 
@@ -74,12 +72,11 @@ fn should_work() {
     let client = ScrollClient::new(
         url,
         index.into(),
-        Some("/dev/null".into()),
+        "/dev/null".into(),
         None,
         None,
         false,
         true,
-        false,
         Vec::new(),
     );
 

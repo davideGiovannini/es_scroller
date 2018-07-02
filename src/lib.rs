@@ -23,6 +23,7 @@ pub use elasticsearch::errors::EsError;
 
 use std::fs::File;
 use std::io::{stdout, Stdout, Write};
+use std::path::Path;
 
 enum FileOrStdout {
     File(File),
@@ -64,8 +65,8 @@ pub fn process(scroll_client: &ScrollClient) -> Result<(), EsError> {
     let stdout = stdout();
     //    let mut stdout_lock = stdout.lock();
 
-    let output = if let Some(ref path) = scroll_client.output {
-        FileOrStdout::File(File::create(path.clone()).unwrap())
+    let output = if &scroll_client.output != Path::new("-") {
+        FileOrStdout::File(File::create(scroll_client.output.clone()).unwrap())
     } else {
         FileOrStdout::Stdout(stdout)
     };

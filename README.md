@@ -12,7 +12,6 @@ FLAGS:
     -h, --help       Prints help information
     -p, --pretty     pretty print output
     -s, --silent     hide the progressbar
-        --stream     Stream output to stdout
     -V, --version    Prints version information
 
 OPTIONS:
@@ -22,7 +21,7 @@ OPTIONS:
 ARGS:
     <host>         Url and port of the elastic search host
     <index>        Index to scroll
-    <output>       path of the output jsonl file (only if not using --stream)
+    <output>       path of the output jsonl file (use - to output to stdout instead)
     <source>...    _source  fields
 ```
 
