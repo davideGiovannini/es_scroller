@@ -65,7 +65,7 @@ pub fn process(scroll_client: &ScrollClient) -> Result<(), EsError> {
     let stdout = stdout();
     //    let mut stdout_lock = stdout.lock();
 
-    let output = if &scroll_client.output != Path::new("-") {
+    let output = if scroll_client.output != Path::new("-") {
         FileOrStdout::File(File::create(scroll_client.output.clone()).unwrap())
     } else {
         FileOrStdout::Stdout(stdout)
