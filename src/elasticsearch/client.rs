@@ -107,7 +107,7 @@ impl ScrollClient {
 
         let mut res = res.map_err(|_| EsError::HostUnreachable)?;
 
-        if res.status() == StatusCode::NotFound {
+        if res.status() == StatusCode::NOT_FOUND {
             return Err(EsError::IndexNotFound);
         }
 

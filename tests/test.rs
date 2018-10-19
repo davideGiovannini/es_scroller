@@ -38,7 +38,7 @@ fn should_handle_wrong_index() {
     let res = reqwest::get(url.join(index).unwrap());
 
     assert!(res.is_ok());
-    assert_eq!(res.unwrap().status(), reqwest::StatusCode::NotFound);
+    assert_eq!(res.unwrap().status(), reqwest::StatusCode::NOT_FOUND);
 
     let client = ScrollClient::new(
         url,
@@ -67,7 +67,7 @@ fn should_work() {
     let res = reqwest::get(url.join(index).unwrap());
 
     assert!(res.is_ok());
-    assert_eq!(res.unwrap().status(), reqwest::StatusCode::Ok);
+    assert_eq!(res.unwrap().status(), reqwest::StatusCode::OK);
 
     let client = ScrollClient::new(
         url,
