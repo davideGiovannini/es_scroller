@@ -1,6 +1,6 @@
-mod models;
 mod client;
 pub mod errors;
+mod models;
 
-pub use self::models::EsHit;
 pub use self::client::*;
+pub use self::models::EsHit;

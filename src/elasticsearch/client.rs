@@ -1,20 +1,22 @@
 extern crate structopt;
 
-use reqwest::{Client, Url};
 use elasticsearch::models::*;
+use reqwest::{Client, Url};
 
-use std::path::PathBuf;
+use reqwest::StatusCode;
+use serde_json;
 use std::fs::File;
 use std::io::Read;
-use serde_json;
-use reqwest::StatusCode;
+use std::path::PathBuf;
 
 use elasticsearch::errors::EsError;
 
 #[derive(Debug, StructOpt)]
-#[structopt(about = "An example of StructOpt usage.",
-            raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
-pub struct ScrollClient {
+#[structopt(
+    about = "An example of StructOpt usage.",
+    raw(setting = "structopt::clap::AppSettings::ColoredHelp")
+)]
+pub struct ScrollerOptions {
     /// Url and port of the elastic search host
     host: Url,
 
@@ -45,7 +47,7 @@ pub struct ScrollClient {
     source: Vec<String>,
 }
 
-impl ScrollClient {
+impl ScrollerOptions {
     pub fn new(
         host: Url,
         index: String,
@@ -56,7 +58,7 @@ impl ScrollClient {
         silent: bool,
         source: Vec<String>,
     ) -> Self {
-        ScrollClient {
+        ScrollerOptions {
             host,
             index,
             output,

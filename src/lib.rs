@@ -18,8 +18,8 @@ use serde_json::Error;
 // Updated url https://www.elastic.co/guide/en/elasticsearch/guide/2.x/scroll.html
 
 mod elasticsearch;
-pub use elasticsearch::ScrollClient;
 pub use elasticsearch::errors::EsError;
+pub use elasticsearch::ScrollerOptions;
 
 use std::fs::File;
 use std::io::{stdout, Stdout, Write};
@@ -55,8 +55,8 @@ impl FileOrStdout {
     }
 }
 
-pub fn process(scroll_client: &ScrollClient) -> Result<(), EsError> {
-    let print_function = if scroll_client.pretty {
+pub fn process(options: &ScrollerOptions) -> Result<(), EsError> {
+    let print_function = if options.pretty {
         serde_json::to_string_pretty
     } else {
         serde_json::to_string
@@ -65,26 +65,26 @@ pub fn process(scroll_client: &ScrollClient) -> Result<(), EsError> {
     let stdout = stdout();
     //    let mut stdout_lock = stdout.lock();
 
-    let output = if scroll_client.output != Path::new("-") {
-        FileOrStdout::File(File::create(scroll_client.output.clone()).unwrap())
+    let output = if options.output != Path::new("-") {
+        FileOrStdout::File(File::create(options.output.clone()).unwrap())
     } else {
         FileOrStdout::Stdout(stdout)
     };
 
-    if let Some(limit) = scroll_client.limit {
+    if let Some(limit) = options.limit {
         process_elements(
-            scroll_client.start_scroll()?.take(limit),
+            options.start_scroll()?.take(limit),
             output,
-            &scroll_client.index,
-            scroll_client.silent,
+            &options.index,
+            options.silent,
             print_function,
         )
     } else {
         process_elements(
-            scroll_client.start_scroll()?,
+            options.start_scroll()?,
             output,
-            &scroll_client.index,
-            scroll_client.silent,
+            &options.index,
+            options.silent,
             print_function,
         )
     };

@@ -1,7 +1,7 @@
 extern crate reqwest;
 extern crate scroller;
 
-use scroller::ScrollClient;
+use scroller::ScrollerOptions;
 
 use scroller::EsError;
 
@@ -11,7 +11,7 @@ fn should_handle_wrong_host() {
 
     assert!(reqwest::get(url.clone()).is_err());
 
-    let client = ScrollClient::new(
+    let client = ScrollerOptions::new(
         url,
         "".into(),
         "/dev/null".into(),
@@ -40,7 +40,7 @@ fn should_handle_wrong_index() {
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::NOT_FOUND);
 
-    let client = ScrollClient::new(
+    let client = ScrollerOptions::new(
         url,
         index.into(),
         "/dev/null".into(),
@@ -69,7 +69,7 @@ fn should_work() {
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::OK);
 
-    let client = ScrollClient::new(
+    let client = ScrollerOptions::new(
         url,
         index.into(),
         "/dev/null".into(),
