@@ -13,7 +13,7 @@ use elasticsearch::errors::EsError;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
-    about = "An example of StructOpt usage.",
+    about = "A simple rust client to perform scroll search requests to an ElasticSearch cluster.",
     raw(setting = "structopt::clap::AppSettings::ColoredHelp")
 )]
 pub struct ScrollerOptions {
