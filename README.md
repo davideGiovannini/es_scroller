@@ -3,7 +3,7 @@
 ```text
 scroller 0.1.0
 Davide Giovannini <giovannini.davide90@gmail.com>
-An example of StructOpt usage.
+A simple rust client to perform scroll search requests to an ElasticSearch cluster.
 
 USAGE:
     scroller [FLAGS] [OPTIONS] <host> <index> <output> [source]...
@@ -44,22 +44,8 @@ docker-compose -f tests/docker-compose.yml down -v --rmi local
 
 ## Building a static binary
 
-Copy the project to the docker daemon host
-```bash
-vagrant scp <path-to-project> /tmp/scroller
-```
+To create a static linux binary
 
-Make sure to have the docker image
 ```bash
-docker pull clux/muslrust
-```
-
-Build the project
-```bash
-docker container run --rm -v /tmp/scroller:/volume --name musl -it clux/muslrust cargo install --root .
-```
-
-Copy back the binary
-```bash
-vagrant scp :/tmp/scroller/bin/scroller .
+docker container run --rm -v $PWD:/volume --name musl -it clux/muslrust cargo install --root .
 ```
