@@ -2,6 +2,7 @@
 name = "scroller"
 version = "0.1.0"
 authors = ["Davide Giovannini <giovannini.davide90@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 reqwest = "0.9"
@@ -9,4 +10,4 @@ serde_json = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
 structopt = "0.2"
-indicatif = "0.9"
+indicatif = "0.10"

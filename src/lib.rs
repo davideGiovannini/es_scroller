@@ -1,14 +1,7 @@
-extern crate reqwest;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
-extern crate serde_json;
-
-#[macro_use]
 extern crate structopt;
-
-extern crate indicatif;
 
 use indicatif::*;
 
@@ -18,8 +11,8 @@ use serde_json::Error;
 // Updated url https://www.elastic.co/guide/en/elasticsearch/guide/2.x/scroll.html
 
 mod elasticsearch;
-pub use elasticsearch::errors::EsError;
-pub use elasticsearch::ScrollerOptions;
+pub use crate::elasticsearch::errors::EsError;
+pub use crate::elasticsearch::ScrollerOptions;
 
 use std::fs::File;
 use std::io::{stdout, Stdout, Write};

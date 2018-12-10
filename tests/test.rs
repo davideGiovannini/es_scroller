@@ -1,9 +1,5 @@
-extern crate reqwest;
-extern crate scroller;
-
-use scroller::ScrollerOptions;
-
 use scroller::EsError;
+use scroller::ScrollerOptions;
 
 #[test]
 fn should_handle_wrong_host() {

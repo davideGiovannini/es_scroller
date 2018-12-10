@@ -1,15 +1,14 @@
-extern crate structopt;
-
-use elasticsearch::models::*;
+use crate::elasticsearch::models::*;
 use reqwest::{Client, Url};
 
 use reqwest::StatusCode;
-use serde_json;
+use serde_json::json;
+
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
-use elasticsearch::errors::EsError;
+use crate::elasticsearch::errors::EsError;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -91,11 +90,11 @@ impl ScrollerOptions {
         };
 
         let body = json!({
-    "query": query,
-    "size":  1000,
-    "sort": &["_doc"], // TODO add option to sort on this field (or arbitrary field)
-    "_source": _source,
-    });
+        "query": query,
+        "size":  1000,
+        "sort": &["_doc"], // TODO add option to sort on this field (or arbitrary field)
+        "_source": _source,
+        });
 
         let path = format!("{}/{}", self.index.trim_matches('/'), "_search");
 
@@ -138,9 +137,9 @@ impl<'a> Iterator for ScrollIter<'a> {
     fn next(&mut self) -> Option<<Self as Iterator>::Item> {
         if self.hits.is_empty() {
             let body = json!({
-                    "scroll_id": self.scroll_id,
-                    "scroll": "1m"
-                });
+                "scroll_id": self.scroll_id,
+                "scroll": "1m"
+            });
 
             let url = self.host.join("_search/scroll").unwrap();
 

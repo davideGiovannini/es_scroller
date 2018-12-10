@@ -1,6 +1,3 @@
-extern crate scroller;
-extern crate structopt;
-
 use scroller::{EsError, ScrollerOptions};
 use structopt::StructOpt;
 
