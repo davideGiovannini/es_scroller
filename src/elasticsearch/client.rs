@@ -8,6 +8,8 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
+use structopt::StructOpt;
+
 use crate::elasticsearch::errors::EsError;
 
 #[derive(Debug, StructOpt)]

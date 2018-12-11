@@ -1,8 +1,3 @@
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate structopt;
-
 use indicatif::*;
 
 use serde_json::Error;

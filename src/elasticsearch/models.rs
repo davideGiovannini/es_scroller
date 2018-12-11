@@ -1,4 +1,5 @@
 use serde_json::Value;
+use serde_derive::{Serialize, Deserialize};
 
 #[derive(Debug, Deserialize)]
 pub struct EsResponse {
