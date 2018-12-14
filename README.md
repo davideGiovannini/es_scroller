@@ -47,5 +47,5 @@ docker-compose -f tests/docker-compose.yml down -v --rmi local
 To create a static linux binary
 
 ```bash
-docker container run --rm -v $PWD:/volume --name musl -it clux/muslrust cargo install --root .
+docker container run --rm -v $PWD:/volume --name musl -it clux/muslrust cargo install --force --root . --path .
 ```
