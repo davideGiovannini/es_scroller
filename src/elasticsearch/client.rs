@@ -173,6 +173,14 @@ impl<'a> Iterator for ScrollIter<'a> {
             // todo check terminated_early bool
         }
         self.hits.pop()
+
+        // TODO delete scroll when iteration is done
+        /*
+        DELETE /_search/scroll
+            {
+                "scroll_id" : "DXF1ZXJ5QW5kRmV0Y2gBAAAAAAAAAD4WYm9laVYtZndUQlNsdDcwakFMNjU1QQ=="
+            }
+        */
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
