@@ -34,7 +34,7 @@ fn parse_url(src: &str) -> Result<Url, UrlError> {
     raw(setting = "structopt::clap::AppSettings::ColoredHelp")
 )]
 pub struct ScrollerOptions {
-    /// Url and port of the elastic search host
+    /// ElasticSearch host, protocol and/or port can be omitted if they are respectively "http" or ":9200"
     #[structopt(parse(try_from_str = "parse_url"))]
     host: Url,
 

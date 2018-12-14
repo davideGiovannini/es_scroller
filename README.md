@@ -1,7 +1,7 @@
 # Scroller
 
 ```text
-scroller 0.1.0
+scroller 0.1.1
 Davide Giovannini <giovannini.davide90@gmail.com>
 A simple rust client to perform scroll search requests to an ElasticSearch cluster.
 
@@ -19,7 +19,8 @@ OPTIONS:
     -q, --query <query>    path to a json file containing the query to use (defaults to match_all)
 
 ARGS:
-    <host>         Url and port of the elastic search host
+    <host>         ElasticSearch host, protocol and/or port can be omitted if they are respectively "http" or
+                   ":9200"
     <index>        Index to scroll
     <output>       path of the output jsonl file (use - to output to stdout instead)
     <source>...    _source  fields
