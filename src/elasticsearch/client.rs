@@ -173,17 +173,21 @@ impl<'a> Iterator for ScrollIter<'a> {
             // todo check terminated_early bool
         }
         self.hits.pop()
-
-        // TODO delete scroll when iteration is done
-        /*
-        DELETE /_search/scroll
-            {
-                "scroll_id" : "DXF1ZXJ5QW5kRmV0Y2gBAAAAAAAAAD4WYm9laVYtZndUQlNsdDcwakFMNjU1QQ=="
-            }
-        */
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.results_count, None)
+    }
+}
+
+impl<'a> Drop for ScrollIter<'a> {
+    fn drop(&mut self) {
+        // Delete the scroll
+
+        let url = self.host.join("_search/scroll").unwrap();
+        let body = json!({
+            "scoll_id": self.scroll_id
+        });
+        self.client.delete(url).json(&body).send().unwrap();
     }
 }

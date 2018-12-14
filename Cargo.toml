@@ -1,6 +1,6 @@
 [package]
 name = "scroller"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Davide Giovannini <giovannini.davide90@gmail.com>"]
 edition = "2018"
 
