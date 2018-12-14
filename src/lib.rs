@@ -1,6 +1,7 @@
 use indicatif::*;
 
 use serde_json::Error;
+use std::io;
 
 // TODO try with reqwest and raw post request https://www.elastic.co/guide/en/elasticsearch/guide/1.x/scan-scroll.html
 // Updated url https://www.elastic.co/guide/en/elasticsearch/guide/2.x/scroll.html
@@ -106,7 +107,11 @@ fn process_elements<I>(
 
     for item in progress_bar.wrap_iter(scroll) {
         let string = print_function(&item).unwrap();
-        writeln!(&mut output, "{}", &string).unwrap();
+        if let Err(er) = writeln!(&mut output, "{}", &string) {
+            if er.kind() == io::ErrorKind::BrokenPipe {
+                break;
+            }
+        }
     }
     progress_bar.finish_with_message(&format!("Downloaded:  {}", index_name));
 }

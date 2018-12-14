@@ -1,7 +1,7 @@
 use crate::elasticsearch::models::*;
 use reqwest::{Client, Url};
 
-use reqwest::StatusCode;
+use reqwest::{StatusCode, UrlError};
 use serde_json::json;
 
 use std::fs::File;
@@ -12,6 +12,22 @@ use structopt::StructOpt;
 
 use crate::elasticsearch::errors::EsError;
 
+fn parse_url(src: &str) -> Result<Url, UrlError> {
+    let url = match Url::parse(src) {
+        Err(UrlError::RelativeUrlWithoutBase) => {
+            let a = format!("{}:9200", src);
+            Url::parse(&a)
+        }
+        case => case,
+    }?;
+
+    if url.cannot_be_a_base() {
+        Url::parse(&format!("http://{}", url))
+    } else {
+        Ok(url)
+    }
+}
+
 #[derive(Debug, StructOpt)]
 #[structopt(
     about = "A simple rust client to perform scroll search requests to an ElasticSearch cluster.",
@@ -19,6 +35,7 @@ use crate::elasticsearch::errors::EsError;
 )]
 pub struct ScrollerOptions {
     /// Url and port of the elastic search host
+    #[structopt(parse(try_from_str = "parse_url"))]
     host: Url,
 
     /// Index to scroll
