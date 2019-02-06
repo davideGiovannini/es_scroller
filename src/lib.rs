@@ -6,9 +6,10 @@ use std::io;
 // TODO try with reqwest and raw post request https://www.elastic.co/guide/en/elasticsearch/guide/1.x/scan-scroll.html
 // Updated url https://www.elastic.co/guide/en/elasticsearch/guide/2.x/scroll.html
 
+mod args;
 mod elasticsearch;
-pub use crate::elasticsearch::errors::EsError;
-pub use crate::elasticsearch::ScrollerOptions;
+pub use self::args::ScrollerOptions;
+pub use self::elasticsearch::{errors::EsError, ScrollClient};
 
 use std::fs::File;
 use std::io::{stdout, Stdout, Write};
@@ -62,7 +63,7 @@ pub fn process(options: &ScrollerOptions) -> Result<(), EsError> {
 
     if let Some(limit) = options.limit {
         process_elements(
-            options.start_scroll()?.take(limit),
+            ScrollClient::new(options)?.take(limit),
             output,
             &options.index,
             options.silent,
@@ -70,7 +71,7 @@ pub fn process(options: &ScrollerOptions) -> Result<(), EsError> {
         )
     } else {
         process_elements(
-            options.start_scroll()?,
+            ScrollClient::new(options)?,
             output,
             &options.index,
             options.silent,

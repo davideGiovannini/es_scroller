@@ -1,105 +1,37 @@
 use crate::elasticsearch::models::*;
 use reqwest::{Client, Url};
 
-use reqwest::{StatusCode, UrlError};
+use reqwest::StatusCode;
 use serde_json::json;
 
 use std::fs::File;
 use std::io::Read;
-use std::path::PathBuf;
 
-use structopt::StructOpt;
-
+use crate::args::ScrollerOptions;
 use crate::elasticsearch::errors::EsError;
 
-fn parse_url(src: &str) -> Result<Url, UrlError> {
-    let url = match Url::parse(src) {
-        Err(UrlError::RelativeUrlWithoutBase) => {
-            let a = format!("{}:9200", src);
-            Url::parse(&a)
-        }
-        case => case,
-    }?;
-
-    if url.cannot_be_a_base() {
-        Url::parse(&format!("http://{}", url))
-    } else {
-        Ok(url)
-    }
+pub struct ScrollClient<'a> {
+    host: &'a Url,
+    client: Client,
+    scroll_id: String,
+    results_count: usize,
+    hits: Vec<EsHit>,
 }
 
-#[derive(Debug, StructOpt)]
-#[structopt(
-    about = "A simple rust client to perform scroll search requests to an ElasticSearch cluster.",
-    raw(setting = "structopt::clap::AppSettings::ColoredHelp")
-)]
-pub struct ScrollerOptions {
-    /// ElasticSearch host, protocol and/or port can be omitted if they are respectively "http" or ":9200"
-    #[structopt(parse(try_from_str = "parse_url"))]
-    host: Url,
-
-    /// Index to scroll
-    pub index: String,
-
-    /// path of the output jsonl file (use - to output to stdout instead)
-    #[structopt(parse(from_os_str))]
-    pub output: PathBuf,
-
-    /// path to a json file containing the query to use (defaults to match_all)
-    #[structopt(short = "q", long = "query", parse(from_os_str))]
-    query: Option<PathBuf>,
-
-    /// get at most <limit> results
-    #[structopt(short = "l", long = "limit")]
-    pub limit: Option<usize>,
-
-    /// pretty print output
-    #[structopt(short = "p", long = "pretty")]
-    pub pretty: bool,
-
-    /// hide the progressbar
-    #[structopt(short = "s", long = "silent")]
-    pub silent: bool,
-
-    /// _source  fields
-    source: Vec<String>,
-}
-
-impl ScrollerOptions {
-    pub fn new(
-        host: Url,
-        index: String,
-        output: PathBuf,
-        query: Option<PathBuf>,
-        limit: Option<usize>,
-        pretty: bool,
-        silent: bool,
-        source: Vec<String>,
-    ) -> Self {
-        ScrollerOptions {
-            host,
-            index,
-            output,
-            query,
-            limit,
-            pretty,
-            silent,
-            source,
-        }
-    }
-    pub fn start_scroll(&self) -> Result<ScrollIter, EsError> {
+impl ScrollClient<'_> {
+    pub fn new(options: &ScrollerOptions) -> Result<ScrollClient, EsError> {
         let client = Client::new();
 
         let default_query = json!({ "match_all": {}});
         let default_source = vec!["*".into()];
 
-        let _source = if self.source.is_empty() {
+        let _source = if options.source.is_empty() {
             &default_source
         } else {
-            &self.source
+            &options.source
         };
 
-        let query = if let Some(ref path) = self.query {
+        let query = if let Some(ref path) = options.query {
             let mut file = File::open(path).unwrap();
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
@@ -115,9 +47,9 @@ impl ScrollerOptions {
         "_source": _source,
         });
 
-        let path = format!("{}/{}", self.index.trim_matches('/'), "_search");
+        let path = format!("{}/{}", options.index.trim_matches('/'), "_search");
 
-        let url = self.host.join(&path).unwrap();
+        let url = options.host.join(&path).unwrap();
 
         let res = client
             .get(url)
@@ -132,8 +64,8 @@ impl ScrollerOptions {
         }
 
         let es_response = res.json::<EsResponse>().unwrap();
-        Ok(ScrollIter {
-            host: &self.host,
+        Ok(ScrollClient {
+            host: &options.host,
             client,
             results_count: es_response.hits.total,
             scroll_id: es_response._scroll_id,
@@ -142,15 +74,7 @@ impl ScrollerOptions {
     }
 }
 
-pub struct ScrollIter<'a> {
-    host: &'a Url,
-    client: Client,
-    scroll_id: String,
-    results_count: usize,
-    hits: Vec<EsHit>,
-}
-
-impl<'a> Iterator for ScrollIter<'a> {
+impl<'a> Iterator for ScrollClient<'a> {
     type Item = EsHit;
 
     fn next(&mut self) -> Option<<Self as Iterator>::Item> {
@@ -180,7 +104,7 @@ impl<'a> Iterator for ScrollIter<'a> {
     }
 }
 
-impl<'a> Drop for ScrollIter<'a> {
+impl<'a> Drop for ScrollClient<'a> {
     fn drop(&mut self) {
         // Delete the scroll
 
