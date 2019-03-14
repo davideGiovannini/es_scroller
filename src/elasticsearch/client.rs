@@ -57,10 +57,14 @@ impl ScrollClient<'_> {
             .json(&body)
             .send();
 
-        let mut res = res.map_err(|_| EsError::HostUnreachable)?;
+        let mut res = res.map_err(|_| EsError::HostUnreachable(options.host.clone()))?;
 
         if res.status() == StatusCode::NOT_FOUND {
-            return Err(EsError::IndexNotFound);
+            let suggested = suggest_correct_index_name(&client, &options.host, &options.index);
+            return Err(EsError::IndexNotFound(
+                options.index.as_str().into(),
+                suggested,
+            ));
         }
 
         let es_response = res.json::<EsResponse>().unwrap();
@@ -114,4 +118,23 @@ impl<'a> Drop for ScrollClient<'a> {
         });
         self.client.delete(url).json(&body).send().unwrap();
     }
+}
+
+const MAX_EDIT_DISTANCE_FOR_SUGGESTER: usize = 15;
+
+fn suggest_correct_index_name(client: &Client, host: &Url, index_name: &str) -> Option<Index> {
+    let mut res = client
+        .get(host.join(&"_cat/indices?format=json").ok()?)
+        .send()
+        .ok()?;
+    let mut names = res.json::<Vec<Index>>().ok()?;
+
+    use edit_distance::edit_distance;
+    names.sort_by_key(|index| edit_distance(index_name, &index.name));
+
+    let first = names
+        .first()
+        .filter(|index| edit_distance(index_name, &index.name) <= MAX_EDIT_DISTANCE_FOR_SUGGESTER);
+
+    first.cloned()
 }

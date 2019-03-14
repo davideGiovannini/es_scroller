@@ -8,7 +8,7 @@ fn should_handle_wrong_host() {
     assert!(reqwest::get(url.clone()).is_err());
 
     let client = ScrollerOptions::new(
-        url,
+        url.clone(),
         "".into(),
         "/dev/null".into(),
         None,
@@ -21,7 +21,7 @@ fn should_handle_wrong_host() {
     let result = scroller::process(&client);
 
     assert!(result.is_err());
-    assert_eq!(result.unwrap_err(), EsError::HostUnreachable)
+    assert_eq!(result.unwrap_err(), EsError::HostUnreachable(url))
 }
 
 #[test]
@@ -50,7 +50,10 @@ fn should_handle_wrong_index() {
     let result = scroller::process(&client);
 
     assert!(result.is_err());
-    assert_eq!(result.unwrap_err(), EsError::IndexNotFound)
+    assert_eq!(
+        result.unwrap_err(),
+        EsError::IndexNotFound(index.into(), Some("twitter".into()))
+    )
 }
 
 #[test]

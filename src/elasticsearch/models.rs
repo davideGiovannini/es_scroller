@@ -35,3 +35,17 @@ pub struct EsHit {
     //    _routing: Option<String>,
     _source: Value,
 }
+
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize)]
+pub struct Index {
+    #[serde(rename = "index")]
+    pub name: String,
+}
+
+impl From<&str> for Index {
+    fn from(string: &str) -> Self {
+        Index {
+            name: string.to_owned(),
+        }
+    }
+}
