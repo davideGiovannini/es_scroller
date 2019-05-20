@@ -5,6 +5,7 @@ image: rust:latest
 stages:
 #- test
 - build
+- build-musl
 
 # Run `cargo build` for the project with stable Rust
 run-build:
@@ -21,6 +22,19 @@ run-build:
     - target/
     - cargo/
 
+run-build-musl:
+  stage: build-musl
+  image: clux/muslrust
+  script:
+    - rustc --version && cargo --version
+    - cargo build --release --jobs 1
+  artifacts:
+    - target/release/scroller
+  cache:
+    paths:
+      - target/
+      - cargo/
+ 
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
 #
