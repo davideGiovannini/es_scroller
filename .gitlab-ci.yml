@@ -29,11 +29,12 @@ run-build-musl:
     - rustc --version && cargo --version
     - cargo build --release --jobs 1
   artifacts:
+    paths:
     - target/release/scroller
   cache:
     paths:
-      - target/
-      - cargo/
+    - target/
+    - cargo/
  
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
