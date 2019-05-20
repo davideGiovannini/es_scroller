@@ -1,7 +1,7 @@
 [package]
 name = "scroller"
 version = "0.1.3"
-authors = ["Davide Giovannini <giovannini.davide90@gmail.com>"]
+authors = ["Davide Giovannini"]
 edition = "2018"
 
 [dependencies]

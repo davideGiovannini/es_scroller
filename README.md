@@ -1,7 +1,6 @@
 # Scroller
 ```text
 scroller 0.1.3
-Davide Giovannini <giovannini.davide90@gmail.com>
 A simple rust client to perform scroll search requests to an ElasticSearch cluster.
 
 USAGE:
