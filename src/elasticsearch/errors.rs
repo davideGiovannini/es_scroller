@@ -20,7 +20,7 @@ impl fmt::Debug for EsError {
                 }
                 Ok(())
             }
-            EsError::Timeout => writeln!(f, ""),
+            EsError::Timeout => writeln!(f),
         }
     }
 }

@@ -5,11 +5,11 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(
     about = "A simple rust client to perform scroll search requests to an ElasticSearch cluster.",
-    raw(setting = "structopt::clap::AppSettings::ColoredHelp")
+    setting = structopt::clap::AppSettings::ColoredHelp
 )]
 pub struct ScrollerOptions {
     /// ElasticSearch host, protocol and/or port can be omitted if they are respectively "http" or ":9200"
-    #[structopt(parse(try_from_str = "parse_url"))]
+    #[structopt(parse(try_from_str = parse_url))]
     pub host: Url,
 
     /// Index to scroll
