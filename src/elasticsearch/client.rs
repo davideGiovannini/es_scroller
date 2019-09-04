@@ -32,10 +32,10 @@ impl ScrollClient<'_> {
         };
 
         let query = if let Some(ref path) = options.query {
-            let mut file = File::open(path).unwrap();
+            let mut file = File::open(path)?;
             let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
-            serde_json::from_str(&contents).unwrap()
+            file.read_to_string(&mut contents)?;
+            serde_json::from_str(&contents)?
         } else {
             default_query
         };

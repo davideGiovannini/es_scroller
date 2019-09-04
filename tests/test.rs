@@ -21,13 +21,16 @@ fn should_handle_wrong_host() {
     let result = scroller::process(&client);
 
     assert!(result.is_err());
-    assert_eq!(result.unwrap_err(), EsError::HostUnreachable(url))
+    match result.unwrap_err() {
+        EsError::HostUnreachable(host_url) => assert_eq!(url, host_url),
+        _ => panic!("tested function returned the wrong error"),
+    }
 }
 
 #[test]
 fn should_handle_wrong_index() {
     let url = reqwest::Url::parse("http://localhost:9200").expect("Invalid url");
-    let index = "non-existent-index".into();
+    let index = "non-existent-index";
 
     assert!(reqwest::get(url.clone()).is_ok());
 
@@ -50,16 +53,17 @@ fn should_handle_wrong_index() {
     let result = scroller::process(&client);
 
     assert!(result.is_err());
-    assert_eq!(
-        result.unwrap_err(),
-        EsError::IndexNotFound(index.into(), Some("twitter".into()))
-    )
+
+    match result.unwrap_err() {
+        EsError::IndexNotFound(e_index, ..) => assert_eq!(e_index, index.into()),
+        _ => panic!("tested function returned the wrong error"),
+    }
 }
 
 #[test]
 fn should_work() {
     let url = reqwest::Url::parse("http://localhost:9200").expect("Invalid url");
-    let index = "twitter".into();
+    let index = "twitter";
 
     assert!(reqwest::get(url.clone()).is_ok());
 
@@ -91,5 +95,15 @@ fn should_handle_timeout() {
 
 #[test]
 fn should_handle_nonexisting_output() {
+    unimplemented!()
+}
+
+#[test]
+fn should_handle_nonexisting_input_query() {
+    unimplemented!()
+}
+
+#[test]
+fn should_handle_malformed_json_input_query() {
     unimplemented!()
 }
