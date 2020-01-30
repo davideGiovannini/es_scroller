@@ -42,8 +42,6 @@ impl ScrollClient<'_> {
 
         let body = json!({
         "query": query,
-        "size":  1000,
-        "sort": &["_doc"], // TODO add option to sort on this field (or arbitrary field)
         "_source": _source,
         });
 
@@ -53,7 +51,7 @@ impl ScrollClient<'_> {
 
         let res = client
             .get(url)
-            .query(&[("scroll", "1m")])
+            .query(&[("scroll", "1m"), ("sort", "_id:asc")])
             .json(&body)
             .send();
 
@@ -67,7 +65,7 @@ impl ScrollClient<'_> {
             ));
         }
 
-        let es_response = res.json::<EsResponse>().unwrap();
+        let es_response = res.json::<EsResponse>().expect("server returned a non json response");
         Ok(ScrollClient {
             host: &options.host,
             client,
@@ -92,7 +90,7 @@ impl<'a> Iterator for ScrollClient<'a> {
 
             let mut res = self.client.get(url).json(&body).send().unwrap();
 
-            let es_response = res.json::<EsResponse>().unwrap();
+            let es_response = res.json::<EsResponse>().expect("server return a non json response");
 
             self.scroll_id = es_response._scroll_id;
             self.hits = es_response.hits.hits;
