@@ -1,5 +1,5 @@
 use crate::elasticsearch::models::*;
-use reqwest::{Client, Url};
+use reqwest::{blocking::Client, Url};
 
 use reqwest::StatusCode;
 use serde_json::json;
@@ -55,7 +55,7 @@ impl ScrollClient<'_> {
             .json(&body)
             .send();
 
-        let mut res = res.map_err(|_| EsError::HostUnreachable(options.host.clone()))?;
+        let res = res.map_err(|_| EsError::HostUnreachable(options.host.clone()))?;
 
         if res.status() == StatusCode::NOT_FOUND {
             let suggested = suggest_correct_index_name(&client, &options.host, &options.index);
@@ -65,7 +65,9 @@ impl ScrollClient<'_> {
             ));
         }
 
-        let es_response = res.json::<EsResponse>().expect("server returned a non json response");
+        let es_response = res
+            .json::<EsResponse>()
+            .expect("server returned a non json response");
         Ok(ScrollClient {
             host: &options.host,
             client,
@@ -88,9 +90,11 @@ impl<'a> Iterator for ScrollClient<'a> {
 
             let url = self.host.join("_search/scroll").unwrap();
 
-            let mut res = self.client.get(url).json(&body).send().unwrap();
+            let res = self.client.get(url).json(&body).send().unwrap();
 
-            let es_response = res.json::<EsResponse>().expect("server return a non json response");
+            let es_response = res
+                .json::<EsResponse>()
+                .expect("server return a non json response");
 
             self.scroll_id = es_response._scroll_id;
             self.hits = es_response.hits.hits;
@@ -112,7 +116,7 @@ impl<'a> Drop for ScrollClient<'a> {
 
         let url = self.host.join("_search/scroll").unwrap();
         let body = json!({
-            "scoll_id": self.scroll_id
+            "scroll_id": self.scroll_id
         });
         self.client.delete(url).json(&body).send().unwrap();
     }
@@ -121,7 +125,7 @@ impl<'a> Drop for ScrollClient<'a> {
 const MAX_EDIT_DISTANCE_FOR_SUGGESTER: usize = 15;
 
 fn suggest_correct_index_name(client: &Client, host: &Url, index_name: &str) -> Option<Index> {
-    let mut res = client
+    let res = client
         .get(host.join(&"_cat/indices?format=json").ok()?)
         .send()
         .ok()?;

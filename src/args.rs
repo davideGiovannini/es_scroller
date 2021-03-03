@@ -1,6 +1,7 @@
-use reqwest::{Url, UrlError};
+use reqwest::Url;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use url::ParseError;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -63,9 +64,9 @@ impl ScrollerOptions {
     }
 }
 
-fn parse_url(src: &str) -> Result<Url, UrlError> {
+fn parse_url(src: &str) -> Result<Url, ParseError> {
     let url = match Url::parse(src) {
-        Err(UrlError::RelativeUrlWithoutBase) => {
+        Err(ParseError::RelativeUrlWithoutBase) => {
             let a = format!("{}:9200", src);
             Url::parse(&a)
         }

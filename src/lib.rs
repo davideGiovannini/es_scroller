@@ -38,10 +38,7 @@ impl Write for FileOrStdout {
 
 impl FileOrStdout {
     fn is_stdout(&self) -> bool {
-        match self {
-            FileOrStdout::Stdout(_) => true,
-            _ => false,
-        }
+        matches!(self, FileOrStdout::Stdout(_))
     }
 }
 

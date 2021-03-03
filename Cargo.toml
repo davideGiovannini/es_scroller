@@ -5,10 +5,11 @@ authors = []
 edition = "2018"
 
 [dependencies]
-reqwest = "0.9"
+reqwest = { version="0.11", features=["blocking", "json"]}
+url = "2.2"
 serde_json = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
 structopt = "0.3"
-indicatif = "0.14"
+indicatif = "0.15"
 edit-distance = "2.1"
