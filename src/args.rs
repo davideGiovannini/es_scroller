@@ -67,14 +67,14 @@ impl ScrollerOptions {
 fn parse_url(src: &str) -> Result<Url, ParseError> {
     let url = match Url::parse(src) {
         Err(ParseError::RelativeUrlWithoutBase) => {
-            let a = format!("{}:9200", src);
+            let a = format!("{src}:9200");
             Url::parse(&a)
         }
         case => case,
     }?;
 
     if url.cannot_be_a_base() {
-        Url::parse(&format!("http://{}", url))
+        Url::parse(&format!("http://{url}"))
     } else {
         Ok(url)
     }

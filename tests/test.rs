@@ -1,11 +1,13 @@
 use scroller::EsError;
 use scroller::ScrollerOptions;
 
+use reqwest::blocking::get as GET;
+
 #[test]
 fn should_handle_wrong_host() {
     let url = reqwest::Url::parse("http://localhost:9999").expect("Invalid url");
 
-    assert!(reqwest::get(url.clone()).is_err());
+    assert!(GET(url.clone()).is_err());
 
     let client = ScrollerOptions::new(
         url.clone(),
@@ -32,9 +34,9 @@ fn should_handle_wrong_index() {
     let url = reqwest::Url::parse("http://localhost:9200").expect("Invalid url");
     let index = "non-existent-index";
 
-    assert!(reqwest::get(url.clone()).is_ok());
+    assert!(GET(url.clone()).is_ok());
 
-    let res = reqwest::get(url.join(index).unwrap());
+    let res = GET(url.join(index).unwrap());
 
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::NOT_FOUND);
@@ -65,9 +67,9 @@ fn should_work() {
     let url = reqwest::Url::parse("http://localhost:9200").expect("Invalid url");
     let index = "twitter";
 
-    assert!(reqwest::get(url.clone()).is_ok());
+    assert!(GET(url.clone()).is_ok());
 
-    let res = reqwest::get(url.join(index).unwrap());
+    let res = GET(url.join(index).unwrap());
 
     assert!(res.is_ok());
     assert_eq!(res.unwrap().status(), reqwest::StatusCode::OK);

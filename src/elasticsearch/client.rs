@@ -126,7 +126,7 @@ const MAX_EDIT_DISTANCE_FOR_SUGGESTER: usize = 15;
 
 fn suggest_correct_index_name(client: &Client, host: &Url, index_name: &str) -> Option<Index> {
     let res = client
-        .get(host.join(&"_cat/indices?format=json").ok()?)
+        .get(host.join("_cat/indices?format=json").ok()?)
         .send()
         .ok()?;
     let mut names = res.json::<Vec<Index>>().ok()?;

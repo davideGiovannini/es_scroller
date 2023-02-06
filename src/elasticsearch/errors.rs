@@ -15,7 +15,7 @@ pub enum EsError {
 impl fmt::Debug for EsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match self {
-            Self::HostUnreachable(url) => writeln!(f, "Host {} is unreachable", url),
+            Self::HostUnreachable(url) => writeln!(f, "Host {url} is unreachable"),
             Self::IndexNotFound(index, suggestion) => {
                 writeln!(f, "\n\tIndex not found:   {}", index.name)?;
                 if let Some(suggestion) = suggestion {
@@ -24,8 +24,8 @@ impl fmt::Debug for EsError {
                 Ok(())
             }
             Self::Timeout => writeln!(f),
-            Self::Io(err) => writeln!(f, "{}", err),
-            Self::JsonDeserialization(err) => writeln!(f, "invalid json\n\t{}", err),
+            Self::Io(err) => writeln!(f, "{err}"),
+            Self::JsonDeserialization(err) => writeln!(f, "invalid json\n\t{err}"),
         }
     }
 }

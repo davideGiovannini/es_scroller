@@ -98,10 +98,10 @@ fn process_elements<I>(
 
     progress_bar.set_draw_target(target);
     progress_bar.set_style(indicatif::ProgressStyle::default_bar()
-        .template("{msg}\n[{elapsed_precise}] |{bar:40.cyan/blue}| {pos:>7}/{len:7} ETA: {eta_precise}")
+        .template("{msg}\n[{elapsed_precise}] |{bar:40.cyan/blue}| {pos:>7}/{len:7} ETA: {eta_precise}").expect("Template error")
         .progress_chars("#>-"));
 
-    progress_bar.set_message(&format!("Downloading: {}", index_name));
+    progress_bar.set_message(format!("Downloading: {index_name}"));
 
     for item in progress_bar.wrap_iter(scroll) {
         let string = print_function(&item).unwrap();
@@ -111,5 +111,5 @@ fn process_elements<I>(
             }
         }
     }
-    progress_bar.finish_with_message(&format!("Downloaded:  {}", index_name));
+    progress_bar.finish_with_message(format!("Downloaded:  {index_name}"));
 }
